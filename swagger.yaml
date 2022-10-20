@@ -1,0 +1,961 @@
+openapi: 3.0.3
+info:
+  title: Employment Center - RestAPI
+  description: ""
+  version: 1.0.0
+  
+servers:
+  - url: https://localhost:5000/api/v1
+  
+tags:
+  - name: Jobs
+    
+  - name: Applications
+   
+  - name: People
+  
+  - name: Locations
+  
+
+   
+paths:
+  /jobs:
+    get:
+      tags:
+        - Jobs
+      summary: Get all jobs
+      operationId: getJobs
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Job'        
+        '401':
+          description: Unauthorized. Bad authorization
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+    
+    
+    put:
+      tags:
+        - Jobs
+      summary: Update an existing job
+      operationId: updateJob
+      requestBody:
+        
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Job'
+         
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'          
+          
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '404':
+          description: Not found. Job is absent
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+        
+      
+    post:
+      tags:
+        - Jobs
+      summary: Add a new job
+      operationId: addJob
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Job'
+         
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'          
+          
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '403':
+          description: Forbidden
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+    
+
+  /jobs/{jobId}:
+    get:
+      tags:
+        - Jobs
+      summary: Find job by ID
+      operationId: getJobById
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema: 
+            type: integer
+          
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'          
+           
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '404':
+          description: Not found. Job is absent
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+    
+    
+    delete:
+      tags:
+        - Jobs
+      summary: Delete a job
+      operationId: deleteJob
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema: 
+            type: integer
+        
+      responses:
+        '204':
+          description: Successfully deleted
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '404':
+          description: Not found. Job is absent
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+  
+  /jobs/{jobId}/applications:
+    get:
+      summary: Get all job's applications
+      tags:
+        - Jobs
+      operationId: getJobApplications
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '405':
+          description: Validation exception
+        'default':
+          description: Unexpected error
+  
+  /applications:
+    get:
+      tags:
+        - Applications
+      summary: Get all applications
+      operationId: getApplications
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'        
+        '401':
+          description: Unauthorized. Bad authorization
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+    
+    
+    put:
+      tags:
+        - Applications
+      summary: Update an existing application
+      operationId: updateApplication
+      requestBody:
+        
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+         
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'          
+          
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '404':
+          description: Not found. Application is absent
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+        
+      
+    post:
+      tags:
+        - Applications
+      summary: Add a new application
+      operationId: addApplication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+         
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'          
+          
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '403':
+          description: Forbidden
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+    
+
+  /applications/{applicationId}:
+    get:
+      tags:
+        - Applications
+      summary: Find application by ID
+      operationId: getApplicationById
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema: 
+            type: integer
+          
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'          
+           
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '404':
+          description: Not found. Application is absent
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+    
+    
+    delete:
+      tags:
+        - Applications
+      summary: Delete a application
+      operationId: deleteApplication
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema: 
+            type: integer
+        
+      responses:
+        '204':
+          description: Successfully deleted
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '404':
+          description: Not found. Application is absent
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+          
+          
+  /people:
+    get:
+      tags:
+        - People
+      summary: Get all people
+      operationId: getPeople
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            person/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'        
+        '401':
+          description: Unauthorized. Bad authorization
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+    
+    
+    put:
+      tags:
+        - People
+      summary: Update an existing person
+      operationId: updatePerson
+      requestBody:
+        
+        content:
+          person/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+         
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            person/json:
+              schema:
+                $ref: '#/components/schemas/Person'          
+          
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '404':
+          description: Not found. Person is absent
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+        
+    post:
+      tags:
+        - People
+      summary: Add a new person
+      operationId: addPerson
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+         
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'          
+          
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '403':
+          description: Forbidden
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception  
+    
+  
+    
+
+  /people/{personId}:
+    get:
+      tags:
+        - People
+      summary: Find person by ID
+      operationId: getPersonById
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema: 
+            type: integer
+          
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            person/json:
+              schema:
+                $ref: '#/components/schemas/Person'          
+           
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '404':
+          description: Not found. Person is absent
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+    
+    delete:
+      tags:
+        - People
+      summary: Delete a person
+      operationId: deletePerson
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema: 
+            type: integer
+        
+      responses:
+        '204':
+          description: Successfully deleted
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '404':
+          description: Not found. Person is absent
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception     
+         
+  /people/{personId}/experiences:
+    get:
+      summary: Get all person's experiences
+      tags:
+        - People
+      operationId: getPersonExperiences
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Experience'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '405':
+          description: Validation exception
+        'default':
+          description: Unexpected error
+          
+          
+    put:
+      tags:
+        - People
+      summary: Update an existing experience
+      operationId: updateExperience
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        
+        content:
+          person/json:
+            schema:
+              $ref: '#/components/schemas/Experience'
+         
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            person/json:
+              schema:
+                $ref: '#/components/schemas/Experience'          
+          
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '404':
+          description: Not found. Person is absent
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+          
+    
+    post:
+      tags:
+        - People
+      summary: Add a new experience
+      operationId: addExperience
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          person/json:
+            schema:
+              $ref: '#/components/schemas/Experience'
+         
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            person/json:
+              schema:
+                $ref: '#/components/schemas/Experience'          
+          
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '403':
+          description: Forbidden
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+    
+  /people/{personId}/experiences/{experienceId}: 
+    get:
+      summary: Get person's experience
+      tags:
+        - People
+      operationId: getPersonExperience
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: experienceId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Experience'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '405':
+          description: Validation exception
+        'default':
+          description: Unexpected error
+          
+    delete:
+      tags:
+        - People
+      summary: Delete an experience
+      operationId: deleteExperience
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema: 
+            type: integer
+        - name: experienceId
+          in: path
+          required: true
+          schema: 
+            type: integer
+        
+      responses:
+        '204':
+          description: Successfully deleted
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '404':
+          description: Not found. Person is absent
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+    
+  
+  /people/{personId}/applications:
+    get:
+      summary: Get all person's applications
+      tags:
+        - People
+      operationId: getPersonApplications
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '405':
+          description: Validation exception
+        'default':
+          description: Unexpected error
+          
+  /locations:
+    get:
+      tags:
+        - Locations
+      summary: Get all locations
+      operationId: getLocations
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            location/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'        
+        '401':
+          description: Unauthorized. Bad authorization
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+    
+    
+    put:
+      tags:
+        - Locations
+      summary: Update an existing location
+      operationId: updateLocation
+      requestBody:
+        
+        content:
+          location/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+         
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            location/json:
+              schema:
+                $ref: '#/components/schemas/Location'          
+          
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '404':
+          description: Not found. Location is absent
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+        
+      
+    post:
+      tags:
+        - Locations
+      summary: Add a new location
+      operationId: addLocation
+      requestBody:
+        content:
+          location/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+         
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            location/json:
+              schema:
+                $ref: '#/components/schemas/Location'          
+          
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '403':
+          description: Forbidden
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+    
+
+  /locations/{locationId}:
+    get:
+      tags:
+        - Locations
+      summary: Find location by ID
+      operationId: getLocationById
+      parameters:
+        - name: locationId
+          in: path
+          required: true
+          schema: 
+            type: integer
+          
+      responses:
+        '200':
+          description: successful operation
+          content:
+            location/json:
+              schema:
+                $ref: '#/components/schemas/Location'          
+           
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '404':
+          description: Not found. Location is absent
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+    
+    
+    delete:
+      tags:
+        - Locations
+      summary: Delete a location
+      operationId: deleteLocation
+      parameters:
+        - name: locationId
+          in: path
+          required: true
+          schema: 
+            type: integer
+        
+      responses:
+        '204':
+          description: Successfully deleted
+        '400':
+          description: Bad request. Invalid fields
+        '401':
+          description: Unauthorized. Bad authorization
+        '404':
+          description: Not found. Location is absent
+        '405':
+          description: Validation exception
+        'default':
+          description: Other exception
+          
+          
+  
+   
+components:
+  schemas:
+    Job:
+      type: object
+      properties: 
+        job_id: 
+          type: integer
+          example: 19
+        name: 
+          type: string
+          example: "Manager"
+        salary:
+          type: number
+          example: 19000
+        company: 
+          type: string
+          example: "Reserved"
+        online:
+          type: boolean
+          example: false
+        location_id:
+          type: integer
+          example: 9
+        
+        
+          
+    Application:
+      type: object
+      properties:
+        application_id:
+          type: integer
+          example: 6
+        person_id:
+          type: integer
+          example: 7
+        job_id:
+          type: integer
+          example: 4
+        dateOfApp:
+          type: string
+          pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/
+          example: "2019-05-17"
+        
+        
+        
+    
+    Person:
+      type: object
+      properties:
+        person_id:
+          type: integer
+          example: 7
+        location_id:
+          type: integer
+          example: 4
+        firstName:
+          type: string
+          example: "Anna"
+        secondName:
+          type: string
+          example: "Berkash"
+        age:
+          type: integer
+          example: 18
+          
+          
+      
+    Location:
+      type: object
+      properties:
+        location_id:
+          type: integer
+          example: 7
+        city:
+          type: string
+          example: "Lviv"
+        country:
+          type: string
+          example: "Ukraine"
+     
+     
+       
+    Experience:
+      type: object 
+      properties: 
+        experience_id:
+          type: integer
+          example: 6
+        beggining:
+          type: string
+          pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/
+          example: "2013-05-17"
+        end:
+          type: string
+          pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/
+          example: "2017-05-17"
+        job:
+          type: string
+          example: "Manager"
+        person_id:
+          type: integer
+          example: 12
+        
+          
+        
+          
+          
+ 
