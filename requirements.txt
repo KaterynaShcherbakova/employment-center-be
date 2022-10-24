@@ -1,2 +1,5 @@
 Flask==2.1.1
 waitress==2.1.2
+SQLAlchemy==1.4.42
+psycopg2==2.9.4
+alembic==1.8.1
