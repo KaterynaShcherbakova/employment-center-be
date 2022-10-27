@@ -1,8 +1,8 @@
-"""Create All Models
+"""All tables
 
-Revision ID: acc31eb68aee
+Revision ID: c3af0b46fadc
 Revises: 
-Create Date: 2022-10-24 20:26:12.515041
+Create Date: 2022-10-27 19:45:12.326311
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'acc31eb68aee'
+revision = 'c3af0b46fadc'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -27,11 +27,11 @@ def upgrade() -> None:
     )
     op.create_table('job',
     sa.Column('job_id', sa.Integer(), nullable=False),
-    sa.Column('location_id', sa.Integer(), nullable=True),
-    sa.Column('company', sa.String(length=80), nullable=False),
     sa.Column('position', sa.String(length=80), nullable=False),
     sa.Column('salary', sa.Integer(), nullable=True),
+    sa.Column('company', sa.String(length=80), nullable=False),
     sa.Column('online', sa.Boolean(), nullable=True),
+    sa.Column('location_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['location_id'], ['location.location_id'], ),
     sa.PrimaryKeyConstraint('job_id')
     )
@@ -55,9 +55,10 @@ def upgrade() -> None:
     )
     op.create_table('experience',
     sa.Column('experience_id', sa.Integer(), nullable=False),
-    sa.Column('person_id', sa.Integer(), nullable=True),
     sa.Column('beggining', sa.Date(), nullable=False),
     sa.Column('end', sa.Date(), nullable=True),
+    sa.Column('job', sa.String(length=80), nullable=False),
+    sa.Column('person_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['person_id'], ['person.person_id'], ),
     sa.PrimaryKeyConstraint('experience_id')
     )
