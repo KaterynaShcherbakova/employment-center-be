@@ -30,19 +30,20 @@ class ExperienceModel(Base):
     __tablename__="experience"
     
     experience_id=Column(Integer, primary_key=True)
-    person_id=Column(Integer, ForeignKey("person.person_id"))
     beggining = Column(Date, nullable=False)
     end = Column(Date, nullable=True)
+    job = Column(String(80), nullable=False)
+    person_id=Column(Integer, ForeignKey("person.person_id"))
 
 class JobModel(Base):
     __tablename__="job"
     
     job_id=Column(Integer(), primary_key=True)
-    location_id=Column(Integer, ForeignKey("location.location_id"))
-    company=Column(String(80), nullable=False)
     position=Column(String(80), nullable=False)
     salary=Column(Integer)
+    company=Column(String(80), nullable=False)
     online=Column(Boolean, default=False)
+    location_id=Column(Integer, ForeignKey("location.location_id"))
     applications = relationship("Application", backref='job')
     
 
