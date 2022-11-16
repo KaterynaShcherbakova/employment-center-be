@@ -47,6 +47,7 @@ pip install -r requirements.txt
 
 ```
 waitress-serve --host 127.0.0.1 main:app 
+flask --app main --debug run
 ```
 
 
