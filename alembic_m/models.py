@@ -1,8 +1,8 @@
 from sqlalchemy import UniqueConstraint, Column, Integer, String, ForeignKey, Date, Boolean
 from sqlalchemy.orm import declarative_base, relationship
+from .db import Base
 from datetime import date
 
-Base = declarative_base()
 
 class LocationModel(Base):
     __tablename__="location"
@@ -20,11 +20,14 @@ class PersonModel(Base):
     
     person_id=Column(Integer, primary_key=True)
     location_id=Column(Integer, ForeignKey("location.location_id"))
+    username = Column(String(45), nullable=False, unique=True)
+    password = Column(String(45), nullable=False, unique=True)
+    email = Column(String(45), nullable=False, unique=True)
     firstName=Column(String(64), nullable=False)
     secondName=Column(String(64), nullable=False)
     age=Column(Integer, nullable=False)
-    experiences=relationship("ExperienceModel", backref='person')
-    applications = relationship("Application", backref='person')
+    experiences= relationship("ExperienceModel", backref='person')
+    applications = relationship("ApplicationModel", backref='person')
 
 class ExperienceModel(Base):
     __tablename__="experience"
@@ -44,7 +47,7 @@ class JobModel(Base):
     company=Column(String(80), nullable=False)
     online=Column(Boolean, default=False)
     location_id=Column(Integer, ForeignKey("location.location_id"))
-    applications = relationship("Application", backref='job')
+    applications = relationship("ApplicationModel", backref='job')
     
 
 class ApplicationModel(Base):
