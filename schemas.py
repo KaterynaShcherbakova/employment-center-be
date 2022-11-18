@@ -1,8 +1,9 @@
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from alembic_m.models import LocationModel, PersonModel, ExperienceModel, JobModel, ApplicationModel
-from flask_bcrypt import generate_password_hash
 from marshmallow import Schema, validate, fields
+from flask_httpauth import HTTPBasicAuth
 
+auth = HTTPBasicAuth()
 class LocationModelSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = LocationModel
@@ -14,6 +15,8 @@ class PersonModelSchema(SQLAlchemyAutoSchema):
         model = PersonModel
         load_instance = True
         include_fk = True
+    #     exclude = ("password",)
+    # password = auto_field(load_only=True)
 
 
 class ExperienceModelSchema(SQLAlchemyAutoSchema):

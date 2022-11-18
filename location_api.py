@@ -6,13 +6,17 @@ from schemas import LocationModelSchema
 from marshmallow.exceptions import ValidationError
 from resp_error import errs, json_error
 
+from all_api import *
+
 location_schema = LocationModelSchema()
 
 class LocationAPI(Resource):
+    @auth.login_required
     def get(self):
         locations_list = LocationModel.query.all()
         return location_schema.dump(locations_list, many=True), 200
 
+    @auth.login_required(role="admin")
     def post(self):
         json_data = request.get_json()
         if not json_data:
@@ -28,6 +32,7 @@ class LocationAPI(Resource):
         db_session.commit()
         return json_data, 201
 
+    @auth.login_required(role="admin")
     def put(self):
         json_data = request.get_json()
         if not json_data:
@@ -45,12 +50,14 @@ class LocationAPI(Resource):
         return json_data, 200
 
 class LocationIdAPI(Resource):
+    @auth.login_required
     def get(self, location_id):
         location = LocationModel.query.get(location_id)
         if not location:
             return errs.not_found
         return location_schema.dump(location), 200
 
+    @auth.login_required(role="admin")
     def delete(self, location_id):
         location = LocationModel.query.get(location_id)
         if not location:
@@ -58,4 +65,3 @@ class LocationIdAPI(Resource):
         db_session.delete(location)
         db_session.commit()
         return '', 204
-

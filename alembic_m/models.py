@@ -2,7 +2,8 @@ from sqlalchemy import UniqueConstraint, Column, Integer, String, ForeignKey, Da
 from sqlalchemy.orm import declarative_base, relationship
 from .db import Base
 from datetime import date
-
+# alembic revision --autogenerate -m "Create tables"
+# alembic upgrade heads
 
 class LocationModel(Base):
     __tablename__="location"
@@ -21,13 +22,15 @@ class PersonModel(Base):
     person_id=Column(Integer, primary_key=True)
     location_id=Column(Integer, ForeignKey("location.location_id"))
     username = Column(String(45), nullable=False, unique=True)
-    password = Column(String(45), nullable=False, unique=True)
+    password = Column(String(512), nullable=False)
     email = Column(String(45), nullable=False, unique=True)
     firstName=Column(String(64), nullable=False)
     secondName=Column(String(64), nullable=False)
     age=Column(Integer, nullable=False)
+    role=Column(String(45), nullable=False, default="applicant")
     experiences= relationship("ExperienceModel", backref='person')
     applications = relationship("ApplicationModel", backref='person')
+
 
 class ExperienceModel(Base):
     __tablename__="experience"
@@ -46,6 +49,7 @@ class JobModel(Base):
     salary=Column(Integer)
     company=Column(String(80), nullable=False)
     online=Column(Boolean, default=False)
+    creator_id=Column(Integer, ForeignKey("person.person_id"))
     location_id=Column(Integer, ForeignKey("location.location_id"))
     applications = relationship("ApplicationModel", backref='job')
     

@@ -5,14 +5,17 @@ from alembic_m.models import JobModel, ApplicationModel, PersonModel
 from schemas import ApplicationModelSchema
 from marshmallow.exceptions import ValidationError
 from resp_error import errs, json_error
+from all_api import *
 
 application_schema = ApplicationModelSchema()
 
 class ApplicationAPI(Resource):
+    @auth.login_required(role=["admin", "aplicant", "employer"])
     def get(self):
         applications_list = ApplicationModel.query.all()
         return application_schema.dump(applications_list, many=True), 200
 
+    @auth.login_required(role="aplicant")
     def post(self):
         json_data = request.get_json()
         if not json_data:
@@ -34,6 +37,7 @@ class ApplicationAPI(Resource):
         db_session.commit()
         return json_data, 201
 
+    @auth.login_required(role=["aplicant","admin"])
     def put(self):
         json_data = request.get_json()
         if not json_data:
@@ -52,21 +56,29 @@ class ApplicationAPI(Resource):
         except ValidationError as err:
             return json_error(err.messages, 400)
 
+        if data.person_id != get_current_user().person_id and get_current_user().role != "admin":
+            return errs.no_access
+
         db_session.add(data)
         db_session.commit()
         return json_data, 200
 
 class ApplicationIdAPI(Resource):
+    @auth.login_required(role="admin")
     def get(self, application_id):
         application = ApplicationModel.query.get(application_id)
         if not application:
             return errs.not_found
         return application_schema.dump(application), 200
 
+    @auth.login_required(role=["aplicant", "admin"])
     def delete(self, application_id):
         application = ApplicationModel.query.get(application_id)
         if not application:
             return errs.not_found
+        if application.person_id != get_current_user().person_id and get_current_user().role != "admin":
+            return errs.no_access
+
         db_session.delete(application)
         db_session.commit()
         return '', 204
