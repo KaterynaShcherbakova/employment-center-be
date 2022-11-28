@@ -10,6 +10,7 @@ from all_api import *
 
 location_schema = LocationModelSchema()
 
+
 class LocationAPI(Resource):
     @auth.login_required
     def get(self):
@@ -21,13 +22,14 @@ class LocationAPI(Resource):
         json_data = request.get_json()
         if not json_data:
             return errs.bad_request
-        location = LocationModel.query.get(json_data.get("location_id", None))
-        if location:
-            return errs.exists
         try:
             data = location_schema.load(json_data, session=db_session)
         except ValidationError as err:
             return json_error(err.messages, 400)
+        location = LocationModel.query.get(json_data.get("location_id", None))
+        if location:
+            return errs.exists
+
         db_session.add(data)
         db_session.commit()
         return json_data, 201
@@ -37,17 +39,18 @@ class LocationAPI(Resource):
         json_data = request.get_json()
         if not json_data:
             return errs.bad_request
-        location = LocationModel.query.get(json_data.get("location_id", None))
-        if not location:
-            return errs.not_found
         try:
             data = location_schema.load(json_data, session=db_session, partial=True)
         except ValidationError as err:
             return json_error(err.messages, 400)
+        location = LocationModel.query.get(json_data.get("location_id", None))
+        if not location:
+            return errs.not_found
 
         db_session.add(data)
         db_session.commit()
         return json_data, 200
+
 
 class LocationIdAPI(Resource):
     @auth.login_required

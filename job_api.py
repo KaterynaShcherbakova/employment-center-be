@@ -23,11 +23,12 @@ class JobIdAPI(Resource):
         job = JobModel.query.get(job_id)
         if not job:
             return errs.not_found
-        if get_current_user().person_id != job.creator_id and get_current_user().role!="admin":
+        if get_current_user().person_id != job.creator_id and get_current_user().role != "admin":
             return errs.no_access
         db_session.delete(job)
         db_session.commit()
         return '', 204
+
 
 class JobAPI(Resource):
     def get(self):
@@ -39,16 +40,20 @@ class JobAPI(Resource):
         json_data = request.get_json()
         if not json_data:
             return errs.bad_request
-        job = JobModel.query.get(json_data.get("job_id", None))
-        if job:
-            return errs.exists
-        location = LocationModel.query.get(json_data.get("location_id", None))
-        if not location:
-            return json_error('Non-existent location', 400)
         try:
             data = job_schema.load(json_data, session=db_session)
         except ValidationError as err:
             return json_error(err.messages, 400)
+        job = JobModel.query.get(json_data.get("job_id", None))
+        if job:
+            return errs.exists
+        location = LocationModel.query.get(json_data.get("location_id", None))
+        person = PersonModel.query.get(json_data.get("creator_id", None))
+        if not person:
+            return json_error('Non-existent person', 400)
+        if not location:
+            return json_error('Non-existent location', 400)
+
         data.creator_id = get_current_user().person_id
         db_session.add(data)
         db_session.commit()
@@ -59,6 +64,10 @@ class JobAPI(Resource):
         json_data = request.get_json()
         if not json_data:
             return errs.bad_request
+        try:
+            data = job_schema.load(json_data, session=db_session, partial=True)
+        except ValidationError as err:
+            return json_error(err.messages, 400)
         job = JobModel.query.get(json_data.get("job_id", None))
         if not job:
             return errs.not_found
@@ -66,10 +75,6 @@ class JobAPI(Resource):
         location = LocationModel.query.get(json_data.get("location_id", None))
         if not location:
             return json_error('Non-existent location', 400)
-        try:
-            data = job_schema.load(json_data, session=db_session,  partial=True)
-        except ValidationError as err:
-            return json_error(err.messages, 400)
 
         if get_current_user().person_id != job.creator_id and get_current_user().role != "admin":
             return errs.no_access
@@ -78,6 +83,7 @@ class JobAPI(Resource):
         db_session.commit()
         return json_data, 200
 
+
 class JobIdApplicationAPI(Resource):
     @auth.login_required(role=["employer", "admin"])
     def get(self, job_id):
@@ -85,8 +91,7 @@ class JobIdApplicationAPI(Resource):
         if not job:
             return errs.not_found
         applications = job.applications
-        if not applications:
-            return errs.not_found
+
         if get_current_user().person_id != job.creator_id and get_current_user().role != "admin":
             return errs.no_access
 

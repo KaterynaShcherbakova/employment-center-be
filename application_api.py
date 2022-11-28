@@ -9,17 +9,23 @@ from all_api import *
 
 application_schema = ApplicationModelSchema()
 
+
 class ApplicationAPI(Resource):
-    @auth.login_required(role=["admin", "aplicant", "employer"])
+    @auth.login_required(role=["admin", "applicant", "employer"])
     def get(self):
         applications_list = ApplicationModel.query.all()
         return application_schema.dump(applications_list, many=True), 200
 
-    @auth.login_required(role="aplicant")
+    @auth.login_required(role=["admin","applicant"])
     def post(self):
         json_data = request.get_json()
         if not json_data:
             return errs.bad_request
+
+        try:
+            data = application_schema.load(json_data, session=db_session)
+        except ValidationError as err:
+            return json_error(err.messages, 400)
         application = ApplicationModel.query.get(json_data.get("application_id", None))
         if application:
             return errs.exists
@@ -29,32 +35,32 @@ class ApplicationAPI(Resource):
         job = JobModel.query.get(json_data.get("job_id", None))
         if not job:
             return json_error('Non-existent job', 400)
-        try:
-            data = application_schema.load(json_data, session=db_session)
-        except ValidationError as err:
-            return json_error(err.messages, 400)
         db_session.add(data)
         db_session.commit()
         return json_data, 201
 
-    @auth.login_required(role=["aplicant","admin"])
+    @auth.login_required(role=["applicant", "admin"])
     def put(self):
         json_data = request.get_json()
         if not json_data:
             return errs.bad_request
+
+        try:
+            data = application_schema.load(json_data, session=db_session, partial=True)
+        except ValidationError as err:
+            return json_error(err.messages, 400)
+
         application = ApplicationModel.query.get(json_data.get("application_id", None))
         if not application:
             return errs.not_found
+
         person = PersonModel.query.get(json_data.get("person_id", None))
         if not person:
             return json_error('Non-existent person', 400)
         job = JobModel.query.get(json_data.get("job_id", None))
         if not job:
             return json_error('Non-existent job', 400)
-        try:
-            data = application_schema.load(json_data, session=db_session,  partial=True)
-        except ValidationError as err:
-            return json_error(err.messages, 400)
+
 
         if data.person_id != get_current_user().person_id and get_current_user().role != "admin":
             return errs.no_access
@@ -62,6 +68,7 @@ class ApplicationAPI(Resource):
         db_session.add(data)
         db_session.commit()
         return json_data, 200
+
 
 class ApplicationIdAPI(Resource):
     @auth.login_required(role="admin")
@@ -71,7 +78,7 @@ class ApplicationIdAPI(Resource):
             return errs.not_found
         return application_schema.dump(application), 200
 
-    @auth.login_required(role=["aplicant", "admin"])
+    @auth.login_required(role=["applicant", "admin"])
     def delete(self, application_id):
         application = ApplicationModel.query.get(application_id)
         if not application:
@@ -82,4 +89,3 @@ class ApplicationIdAPI(Resource):
         db_session.delete(application)
         db_session.commit()
         return '', 204
-
