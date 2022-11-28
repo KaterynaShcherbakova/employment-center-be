@@ -62,3 +62,5 @@ waitress==2.1.2
 webencodings==0.5.1
 Werkzeug==2.2.2
 zipp==3.10.0
+Flask-Testing==0.8.1
+coverage==6.5.0

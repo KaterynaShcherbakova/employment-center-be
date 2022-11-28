@@ -13,6 +13,7 @@ person_schema = PersonModelSchema()
 experience_schema = ExperienceModelSchema()
 application_schema = ApplicationModelSchema()
 
+
 class PeopleAPI(Resource):
     @auth.login_required(role="admin")
     def get(self):
@@ -23,16 +24,19 @@ class PeopleAPI(Resource):
         json_data = request.get_json()
         if not json_data:
             return errs.bad_request
-        person = PersonModel.query.get(json_data.get("person_id", None))
-        if person:
-            return errs.exists
-        location = LocationModel.query.get(json_data.get("location_id", None))
-        if not location:
-            return json_error('Non-existent location', 400)
         try:
             data = person_schema.load(json_data, session=db_session)
         except ValidationError as err:
             return json_error(err.messages, 400)
+        person = PersonModel.query.get(json_data.get("person_id", None))
+        if person:
+            return errs.exists
+        location_id = json_data.get("location_id", None)
+        if location_id is not None:
+            location = LocationModel.query.get(location_id)
+            if not location:
+                return json_error('Non-existent location', 400)
+
         if PersonModel.query.filter_by(username=data.username).first():
             return json_error('Not unique username', 400)
         if PersonModel.query.filter_by(email=data.email).first():
@@ -47,17 +51,18 @@ class PeopleAPI(Resource):
         json_data = request.get_json()
         if not json_data:
             return errs.bad_request
+        try:
+            data = person_schema.load(json_data, session=db_session, partial=True)
+        except ValidationError as err:
+            return json_error(err.messages, 400)
         person = PersonModel.query.get(json_data.get("person_id", None))
         if not person:
             return errs.not_found
         location = LocationModel.query.get(json_data.get("location_id", None))
         if not location:
             return json_error('Non-existent location', 400)
-        try:
-            data = person_schema.load(json_data, session=db_session,  partial=True)
-        except ValidationError as err:
-            return json_error(err.messages, 400)
-        if data.person_id!=get_current_user().person_id and get_current_user().role!="admin":
+
+        if data.person_id != get_current_user().person_id and get_current_user().role != "admin":
             return errs.no_access
         username = PersonModel.query.filter_by(username=data.username).first()
         email = PersonModel.query.filter_by(email=data.email).first()
@@ -70,13 +75,14 @@ class PeopleAPI(Resource):
         db_session.commit()
         return json_data, 200
 
+
 class PersonIdAPI(Resource):
     @auth.login_required
     def get(self, person_id):
         person = PersonModel.query.get(person_id)
         if not person:
             return errs.not_found
-        if get_current_user().person_id!=person_id and get_current_user().role!="admin":
+        if get_current_user().person_id != person_id and get_current_user().role != "admin":
             return errs.no_access
         return person_schema.dump(person), 200
 
@@ -113,55 +119,61 @@ class PersonUsernameAPI(Resource):
         db_session.commit()
         return '', 204
 
+
 class PersonExperienceApi(Resource):
     @auth.login_required(role="admin")
     def get(self, person_id):
-        person=PersonModel.query.get(person_id)
+        person = PersonModel.query.get(person_id)
         if not person:
             return errs.not_found
         experiences = person.experiences
         return experience_schema.dump(experiences, many=True), 200
 
-    @auth.login_required(role=["aplicant", "admin"])
+    @auth.login_required(role=["applicant", "admin"])
     def post(self, person_id):
         json_data = request.get_json()
         if not json_data:
             return errs.bad_request
-        experience = ExperienceModel.query.get(json_data.get("experience_id", None))
-        if experience:
-            return errs.exists
-        json_data['person_id']=person_id
         try:
             data = experience_schema.load(json_data, session=db_session)
         except ValidationError as err:
             return json_error(err.messages, 400)
+        experience = ExperienceModel.query.get(json_data.get("experience_id", None))
+        if experience:
+            return errs.exists
+        person = PersonModel.query.get(json_data.get("person_id", None))
+        if not person:
+            return json_error('Non-existent person', 400)
         if get_current_user().person_id != person_id and get_current_user().role != "admin":
             return errs.no_access
         db_session.add(data)
         db_session.commit()
         return json_data, 201
 
-
-    @auth.login_required(role=["aplicant", "admin"])
+    @auth.login_required(role=["applicant", "admin"])
     def put(self, person_id):
         json_data = request.get_json()
         if not json_data:
             return errs.bad_request
+        try:
+            data = experience_schema.load(json_data, session=db_session, partial=True)
+        except ValidationError as err:
+            return json_error(err.messages, 400)
         experience = ExperienceModel.query.get(json_data.get("experience_id", None))
         if not experience:
             return errs.exists
-        try:
-            data = experience_schema.load(json_data, session=db_session,  partial=True)
-        except ValidationError as err:
-            return json_error(err.messages, 400)
+        person = PersonModel.query.get(json_data.get("person_id", None))
+        if not person:
+            return json_error('Non-existent person', 400)
         if person_id != get_current_user().person_id and get_current_user().role != "admin":
             return errs.no_access
         db_session.add(data)
         db_session.commit()
-        return json_data, 201
+        return json_data, 200
+
 
 class PersonExperienceIdAPI(Resource):
-    @auth.login_required(role=["aplicant", "admin"])
+    @auth.login_required(role=["applicant", "admin"])
     def get(self, person_id, experience_id):
         person = PersonModel.query.get(person_id)
         if person_id != get_current_user().person_id and get_current_user().role != "admin":
@@ -175,7 +187,7 @@ class PersonExperienceIdAPI(Resource):
         experience = ExperienceModel.query.get(experience_id)
         return experience_schema.dump(experience), 200
 
-    @auth.login_required(role=["aplicant", "admin"])
+    @auth.login_required(role=["applicant", "admin"])
     def delete(self, person_id, experience_id):
         person = PersonModel.query.get(person_id)
         if person_id != get_current_user().person_id and get_current_user().role != "admin":
